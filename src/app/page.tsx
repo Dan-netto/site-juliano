@@ -1,5 +1,10 @@
-import React from 'react';
-import { FileText, Calculator, Briefcase, Building2, Phone } from "lucide-react";
+"use client";
+import { Header } from "@/components/header"
+import { WhatsAppButton } from "@/components/whatsapp-button"
+import { Button } from "@/components/ui/button" // Mantido, mas não é usado na ContactForm
+import { FileText, Calculator, Briefcase, Building2, Phone } from "lucide-react"
+import Link from "next/link"
+import React, { useState } from 'react'; // Adicionado para uso potencial de hooks ou FC
 
 /**
  * Nota Técnica:
@@ -39,6 +44,8 @@ const ContactForm = () => {
 };
 
 export default function Home() {
+  const [selectedClient, setSelectedClient] = useState<number | null>(null);
+
   const services = [
     { icon: FileText, title: "Laudos Técnicos de Engenharia" },
     { icon: Building2, title: "Consultoria em Obras de Condomínio" },
@@ -48,22 +55,51 @@ export default function Home() {
     { icon: Building2, title: "Projetos Estruturais e Arquitetônicos" }
   ];
 
+  // const clients = [
+  //   "/images/clientes/bahiana.png",
+  //   "/images/clientes/barreiras.png",
+  //   "/images/clientes/bernoulli.png",
+  //   "/images/clientes/chez_bernard.png",
+  //   "/images/clientes/civil.png",
+  //   "/images/clientes/la_felicita.png",
+  //   "/images/clientes/mrv.png",
+  //   "/images/clientes/Naia.png",
+  //   "/images/clientes/pinheiros.png",
+  //   "/images/clientes/politeama.png",
+  //   "/images/clientes/rio_parana.png",
+  //   "/images/clientes/roltek.png",
+  //   "/images/clientes/tecnorem.png",
+  //   "/images/clientes/voltz.png"
+  // ];
+
+  // Lista de clientes atualizada com as descrições fornecidas
   const clients = [
-    "/images/clientes/bahiana.png",
-    "/images/clientes/barreiras.png",
-    "/images/clientes/bernoulli.png",
-    "/images/clientes/chez_bernard.png",
-    "/images/clientes/civil.png",
-    "/images/clientes/la_felicita.png",
-    "/images/clientes/mrv.png",
-    "/images/clientes/Naia.png",
-    "/images/clientes/pinheiros.png",
-    "/images/clientes/politeama.png",
-    "/images/clientes/rio_parana.png",
-    "/images/clientes/roltek.png",
-    "/images/clientes/tecnorem.png",
-    "/images/clientes/voltz.png"
+    { name: "Bahiana", src: "/images/clientes/bahiana.png", description: "Consultoria e gestão de obra na construção do centro médico de esterilização." },
+    { name: "Edf Barreiras", src: "/images/clientes/barreiras.png", description: "Laudo técnico estrutural do prédio." },
+    { name: "Bernoulli", src: "/images/clientes/bernoulli.png", description: "Gestão da Obra do Colégio no Caminho das Árvores." },
+    { name: "Chez Bernard", src: "/images/clientes/chez_bernard.png", description: "Levantamento Cadastral e Projeto Arquitetônico." },
+    { name: "CIVIL", src: "/images/clientes/civil.png", description: "Gestão de Empreendimentos." },
+    { name: "LÁ FELICITÀ", src: "/images/clientes/la_felicita.png", description: "Consultoria de projetos de condomínio de 890.000 m²: interface com projetos de terraplanagem, arquitetônico e instalações (drenagem, esgoto e elétrica). Gestão do processo de licenciamento com a prefeitura e com o INEMA." },
+    { name: "MRV", src: "/images/clientes/mrv.png", description: "Consultoria e laudo para escavações e segurança do trabalho." },
+    { name: "NAIA", src: "/images/clientes/Naia.png", description: "Gestão de obra de condomínio Alphaville Guarajuba." },
+    { name: "Cond Pinheiros", src: "/images/clientes/pinheiros.png", description: "Laudo técnico estrutural." },
+    { name: "Cond Politeama", src: "/images/clientes/politeama.png", description: "Gestão de obra de condomínio, laudo técnico para aprovação de reforma." },
+    { name: "Roltek", src: "/images/clientes/roltek.png", description: "Consultoria na construção de novo galpão." },
+    { name: "TECNOREM", src: "/images/clientes/tecnorem.png", description: "Gestão de Obra no condomínio Jardim Tropical no Corredor da Vitória." },
+    { name: "VOLTZ", src: "/images/clientes/voltz.png", description: "Projeto arquitetônico e laudo técnico estrutural para construção de balada." }
   ];
+
+  const handleClientClick = (index: number) => {
+    setSelectedClient(selectedClient === index ? null : index);
+    if (selectedClient !== index) {
+      setTimeout(() => {
+        const element = document.getElementById('client-details');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white text-gray-900" style={{ fontFamily: "'Courier New', Courier, monospace" }}>
@@ -83,33 +119,47 @@ export default function Home() {
           html { scroll-behavior: smooth; }
         `}} />
 
-      {/* HEADER */}
-      <header className="w-full border-b bg-white sticky top-0 z-50 shadow-sm">
+      {/* HEADER AJUSTADO COM LOGO E FONTE COURIER NEW */}
+      <header className="w-full border-b bg-white" style={{ fontFamily: "Courier New" }}>
+        {/* CONTAINER DO HEADER */}
         <div className="max-w-6xl mx-auto flex items-center justify-between p-6">
-          <a href="#" className="transition-transform hover:scale-105">
+          {/* LOGO (Imagem no canto superior esquerdo, h-28 solicitado) */}
+          <Link href="/">
             <img
               src="/images/logo.png"
               alt="Logo Novais de Souza"
-              className="h-24 md:h-32 w-auto"
-              onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/300x120?text=NOVAIS+DE+SOUZA" }}
+              className="h-32 w-auto" // Aumentado para h-28
             />
-          </a>
+          </Link>
 
-          <div className="flex items-center space-x-8">
-            <nav className="hidden lg:flex space-x-8 text-sm font-bold uppercase tracking-widest">
-              <a href="#sobre" className="hover:text-gray-500 transition-colors">Sobre</a>
-              <a href="#servicos" className="hover:text-gray-500 transition-colors">Serviços</a>
-              <a href="#clientes" className="hover:text-gray-500 transition-colors">Clientes</a>
+          {/* CONTEÚDO DO LADO DIREITO (Texto "Novais de Souza", Navegação e Botão) */}
+          <div className="flex items-center space-x-6">
+
+            {/* NAVEGAÇÃO */}
+            <nav className="hidden sm:flex space-x-6 text-sm">
+              <Link href="#sobre" className="hover:text-gray-600 transition-colors">
+                Sobre
+              </Link>
+              <Link href="#servicos" className="hover:text-gray-600 transition-colors">
+                Serviços
+              </Link>
+              <Link href="#clientes" className="hover:text-gray-600 transition-colors">
+                Clientes
+              </Link>
             </nav>
 
-            <a href="#orcamento">
-              <button className="bg-gray-800 text-white hover:bg-black h-12 px-6 text-sm rounded-none font-bold uppercase tracking-tighter transition-all">
+            {/* BOTÃO DE ORÇAMENTO */}
+            <Link href="#orcamento">
+              <button 
+                className="bg-gray-800 text-white hover:bg-gray-700 h-10 px-4 py-2 text-sm rounded-none font-bold" 
+              >
                 Solicite Orçamento
               </button>
-            </a>
+            </Link>
           </div>
         </div>
       </header>
+
 
       <main>
         {/* HERO */}
@@ -178,18 +228,58 @@ export default function Home() {
 
               <div className="animate-infinite-scroll flex gap-12 items-center">
                 {/* Lista duplicada para efeito infinito contínuo */}
-                {[...clients, ...clients].map((src, i) => (
-                  <div key={i} className="flex-none w-[250px] bg-white border border-gray-100 p-8 flex items-center justify-center h-40 shadow-sm transition-all hover:shadow-md hover:border-gray-300">
+                {[...clients, ...clients].map((client, i) => (
+                  <button 
+                    key={i} 
+                    onClick={() => handleClientClick(i % clients.length)}
+                    className={`flex-none w-[220px] bg-white border p-6 flex items-center justify-center h-32 transition-all hover:border-gray-800 ${selectedClient === (i % clients.length) ? 'border-gray-800 ring-2 ring-gray-200' : 'border-gray-200'}`}
+                  >
                     <img 
-                      src={src} 
-                      alt="Cliente Novais de Souza" 
-                      className="max-h-20 max-w-full object-contain filter grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-700" 
-                      onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerHTML = '<span class="text-xs font-bold uppercase text-gray-300">Parceiro Estratégico</span>' }}
+                      src={client.src} 
+                      alt={client.name} 
+                      className={`max-h-16 max-w-full object-contain transition-all duration-500 ${selectedClient === (i % clients.length) ? 'grayscale-0' : 'grayscale opacity-50'}`} 
                     />
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
+
+          {/* SEÇÃO DE DETALHES */}
+            <div id="client-details" className={`mt-12 overflow-hidden transition-all duration-500 ${selectedClient !== null ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}>
+              {selectedClient !== null && (
+                <div className="bg-white p-8 md:p-12 border-l-8 border-gray-800 shadow-xl relative animate-in fade-in slide-in-from-top-4">
+                  <button 
+                    onClick={() => setSelectedClient(null)}
+                    className="absolute top-4 right-4 text-gray-400 hover:text-black uppercase text-xs font-bold"
+                  >
+                    Fechar [x]
+                  </button>
+                  <div className="flex flex-col md:flex-row items-center gap-10">
+                    <div className="w-40 flex-none flex justify-center">
+                      <img src={clients[selectedClient].src} className="max-h-24 object-contain" alt="Logo Cliente" />
+                    </div>
+                    <div className="text-left">
+                      <h3 className="text-2xl font-bold uppercase mb-4 tracking-tighter text-gray-800">{clients[selectedClient].name}</h3>
+                      <p className="text-lg leading-relaxed text-gray-700 font-sans italic border-t pt-4">
+                        {clients[selectedClient].description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* SERVIÇOS */}
+        <section id="servicos" className="py-24 px-4 bg-white">
+          <div className="container mx-auto max-w-6xl grid md:grid-cols-3 gap-8">
+            {services.map((s, i) => (
+              <div key={i} className="p-8 border border-gray-100 hover:border-gray-800 transition-all text-center group">
+                <s.icon className="mx-auto mb-4 text-gray-300 group-hover:text-gray-800 transition-colors" size={40} />
+                <h3 className="font-bold uppercase text-sm tracking-widest">{s.title}</h3>
+              </div>
+            ))}
           </div>
         </section>
 
