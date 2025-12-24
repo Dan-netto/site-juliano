@@ -35,6 +35,22 @@ export default function Home() {
 
   return (
     <>
+      <style dangerouslySetInnerHTML={{ __html: `
+          @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-250px * ${clients.length})); }
+          }
+          .animate-infinite-scroll {
+            display: flex;
+            width: max-content;
+            animation: scroll 40s linear infinite;
+          }
+          .animate-infinite-scroll:hover {
+            animation-play-state: paused;
+          }
+          html { scroll-behavior: smooth; }
+        `}} />
+
       {/* HEADER AJUSTADO COM LOGO E FONTE COURIER NEW */}
       <header className="w-full border-b bg-white" style={{ fontFamily: "Courier New" }}>
         {/* CONTAINER DO HEADER */}
@@ -153,20 +169,29 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CLIENTES */}
-        <section id="clientes" className="py-24 px-4 bg-gray-50">
+        {/* CLIENTES - CARROSSEL INFINITO ATUALIZADO */}
+        <section id="clientes" className="py-24 px-4 bg-gray-50 overflow-hidden border-y border-gray-200">
           <div className="container mx-auto max-w-6xl">
             <h2 className="text-4xl font-bold text-center mb-14">Clientes</h2>
+            
+            <div className="relative flex overflow-x-hidden group">
+              {/* Overlay suave nas bordas para o carrossel */}
+              <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-gray-50 to-transparent z-10 pointer-events-none"></div>
+              <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-gray-50 to-transparent z-10 pointer-events-none"></div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
-              {clients.map((src, i) => (
-                <div
-                  key={i}
-                  className="bg-white rounded border p-4 flex items-center justify-center transition-shadow hover:shadow-md"
-                >
-                  <img src={src} alt="Logo Cliente" className="max-h-20 object-contain" />
-                </div>
-              ))}
+              <div className="animate-infinite-scroll flex gap-8 items-center">
+                {/* Renderiza a lista duas vezes para o loop infinito */}
+                {[...clients, ...clients].map((src, i) => (
+                  <div key={i} className="flex-none w-[220px] bg-white rounded-none border border-gray-200 p-6 flex items-center justify-center h-32 hover:border-gray-400 transition-colors">
+                    <img 
+                      src={src} 
+                      alt={`Cliente ${i}`} 
+                      className="max-h-16 max-w-full object-contain filter grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-500" 
+                      onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerHTML = '<span class="text-xs text-gray-400 uppercase font-bold text-center">Empresa Parceira</span>' }}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
