@@ -272,7 +272,7 @@ export default function Home() {
         {/* CLIENTES - CARROSSEL INFINITO ATUALIZADO */}
         <section id="clientes" className="py-32 px-4 bg-gray-50 overflow-hidden border-y border-gray-200">
           <div className="container mx-auto max-w-6xl">
-            <h2 className="text-4xl font-bold text-center mb-20 uppercase tracking-widest">Empresas que Confiam</h2>
+            <h2 className="text-4xl font-bold text-center mb-20 uppercase tracking-widest">Clientes</h2>
             
             <div className="relative flex overflow-x-hidden group">
               {/* Gradientes laterais para suavizar a entrada/saída */}
