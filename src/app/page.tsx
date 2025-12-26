@@ -2,7 +2,7 @@
 import { Header } from "@/components/header"
 import { WhatsAppButton } from "@/components/whatsapp-button"
 import { Button } from "@/components/ui/button" // Mantido, mas não é usado na ContactForm
-import { FileText, Calculator, Briefcase, Building2, Phone } from "lucide-react"
+import { FileText, Calculator, Briefcase, Building2, Phone, Loader2, MapPin, Mail} from "lucide-react"
 import Link from "next/link"
 import React, { useState } from 'react'; // Adicionado para uso potencial de hooks ou FC
 
@@ -13,30 +13,83 @@ import React, { useState } from 'react'; // Adicionado para uso potencial de hoo
  * diretamente neste arquivo principal.
  */
 
+// SUBSTITUA ESTA URL PELO ENDPOINT QUE O FORMSPREE TE FORNECEU
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/xgoewryn";
+
 const ContactForm = () => {
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setStatus({ type: null, message: '' });
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        setStatus({ 
+          type: 'success', 
+          message: 'Solicitação enviada com sucesso! Entraremos em contacto em breve.' 
+        });
+        form.reset();
+      } else {
+        throw new Error('Falha ao enviar');
+      }
+    } catch (err) {
+      setStatus({ 
+        type: 'error', 
+        message: 'Ocorreu um erro ao enviar. Por favor, tente novamente mais tarde.' 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="container mx-auto max-w-4xl">
-      <form className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
           <div>
             <label className="block text-sm font-bold mb-2 uppercase tracking-wide">Nome completo</label>
-            <input type="text" className="w-full p-4 border border-gray-300 rounded-none focus:outline-none focus:border-gray-800 bg-white" />
+            <input name="name" required type="text" className="w-full p-4 border border-gray-300 rounded-none focus:outline-none focus:border-gray-800 bg-white" />
           </div>
           <div>
             <label className="block text-sm font-bold mb-2 uppercase tracking-wide">E-mail</label>
-            <input type="email" className="w-full p-4 border border-gray-300 rounded-none focus:outline-none focus:border-gray-800 bg-white" />
+            <input name="email" required type="email" className="w-full p-4 border border-gray-300 rounded-none focus:outline-none focus:border-gray-800 bg-white" />
           </div>
         </div>
         <div className="text-left">
           <label className="block text-sm font-bold mb-2 uppercase tracking-wide">Telefone</label>
-          <input type="tel" className="w-full p-4 border border-gray-300 rounded-none focus:outline-none focus:border-gray-800 bg-white" />
+          <input name="phone" type="tel" className="w-full p-4 border border-gray-300 rounded-none focus:outline-none focus:border-gray-800 bg-white" />
         </div>
         <div className="text-left">
           <label className="block text-sm font-bold mb-2 uppercase tracking-wide">Mensagem</label>
-          <textarea rows={5} className="w-full p-4 border border-gray-300 rounded-none focus:outline-none focus:border-gray-800 bg-gray-50 resize-none"></textarea>
+          <textarea name="message" required rows={5} className="w-full p-4 border border-gray-300 rounded-none focus:outline-none focus:border-gray-800 bg-gray-50 resize-none"></textarea>
         </div>
-        <button type="submit" className="w-full bg-gray-800 text-white hover:bg-black text-lg font-bold py-5 rounded-none transition-all uppercase tracking-widest">
-          Enviar Solicitação
+
+        {status.type && (
+          <div className={`p-4 font-bold text-center uppercase tracking-widest animate-in fade-in ${status.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+            {status.message}
+          </div>
+        )}
+
+        <button 
+          disabled={loading}
+          type="submit" 
+          className="w-full bg-gray-800 text-white hover:bg-black text-lg font-bold py-5 rounded-none transition-all uppercase tracking-widest flex items-center justify-center gap-3 disabled:bg-gray-400"
+        >
+          {loading ? <><Loader2 className="animate-spin" /> A Enviar...</> : 'Enviar Solicitação'}
         </button>
       </form>
     </div>
@@ -192,8 +245,8 @@ export default function Home() {
               Nossa missão é a praticidade da Engenharia visando o resultado do cliente.
             </p>
             <p className="text-xl leading-relaxed text-gray-700">
-              Experiência comprovada em grandes construções como o <strong>Centro de Convenções de Salvador</strong>, 
-              o <strong>Colégio Bernoulli</strong>, o <strong>Alphaville Guarajuba</strong> e o <strong>Centro 
+              Experiência comprovada em grandes construções como <strong>o Centro de Convenções de Salvador</strong>, 
+              <strong>o Colégio Bernoulli</strong>, <strong>o Alphaville Guarajuba</strong> e <strong>o Centro 
               Médico na Escola Bahiana de Medicina</strong>.
             </p>
           </div>
@@ -271,7 +324,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SERVIÇOS */}
+        {/* SERVIÇOS
         <section id="servicos" className="py-24 px-4 bg-white">
           <div className="container mx-auto max-w-6xl grid md:grid-cols-3 gap-8">
             {services.map((s, i) => (
@@ -281,7 +334,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </section>
+        </section> */}
 
         {/* ORÇAMENTO */}
         <section id="orcamento" className="py-32 px-4 bg-white">
