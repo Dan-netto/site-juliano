@@ -290,7 +290,7 @@ export default function Home() {
                     <img 
                       src={client.src} 
                       alt={client.name} 
-                      className={`max-h-16 max-w-full object-contain transition-all duration-500 ${selectedClient === (i % clients.length) ? 'grayscale-0' : 'grayscale opacity-50'}`} 
+                      className="max-h-16 max-w-full object-contain" 
                     />
                   </button>
                 ))}
