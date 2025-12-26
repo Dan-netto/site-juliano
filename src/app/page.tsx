@@ -152,7 +152,7 @@ export default function Home() {
         }
       }, 100);
     }
-  };
+  } ;
 
   return (
     <div className="min-h-screen bg-white text-gray-900" style={{ fontFamily: "'Courier New', Courier, monospace" }}>
