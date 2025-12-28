@@ -13,87 +13,150 @@ import React, { useState } from 'react'; // Adicionado para uso potencial de hoo
  * diretamente neste arquivo principal.
  */
 
-// SUBSTITUA ESTA URL PELO ENDPOINT QUE O FORMSPREE TE FORNECEU
-const FORMSPREE_ENDPOINT = "https://formspree.io/f/xgoewryn";
-
 const ContactForm = () => {
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
+    // Substitua pelo seu ID real do Formspree (o código final da URL do seu endpoint)
+    const FORMSPREE_ID = "xgoewryn";
+    const FORMSPREE_ENDPOINT = `https://formspree.io/f/${FORMSPREE_ID}`;
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setStatus({ type: null, message: '' });
+    const [status, setStatus] = useState({
+        submitting: false,
+        succeeded: false,
+        errors: [] as string[]
+    });
 
-    const form = e.currentTarget;
-    const formData = new FormData(form);
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setStatus({ ...status, submitting: true, errors: [] });
 
-    try {
-      const response = await fetch(FORMSPREE_ENDPOINT, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Accept': 'application/json'
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch(FORMSPREE_ENDPOINT, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setStatus({
+                    submitting: false,
+                    succeeded: true,
+                    errors: []
+                });
+                form.reset();
+            } else {
+                setStatus({
+                    submitting: false,
+                    succeeded: false,
+                    errors: data.errors ? data.errors.map((err: any) => err.message) : ['Ocorreu um erro ao enviar.']
+                });
+            }
+        } catch (error) {
+            setStatus({
+                submitting: false,
+                succeeded: false,
+                errors: ['Erro de rede. Verifique a sua conexão.']
+            });
         }
-      });
+    };
 
-      if (response.ok) {
-        setStatus({ 
-          type: 'success', 
-          message: 'Solicitação enviada com sucesso! Entraremos em contacto em breve.' 
-        });
-        form.reset();
-      } else {
-        throw new Error('Falha ao enviar');
-      }
-    } catch (err) {
-      setStatus({ 
-        type: 'error', 
-        message: 'Ocorreu um erro ao enviar. Por favor, tente novamente mais tarde.' 
-      });
-    } finally {
-      setLoading(false);
+    if (status.succeeded) {
+        return (
+            <div className="container mx-auto max-w-4xl p-8 bg-green-50 border border-green-200 text-center animate-in fade-in duration-500">
+                <h3 className="text-2xl font-bold text-green-800 uppercase tracking-widest mb-2">Solicitação Enviada!</h3>
+                <p className="text-green-700">Obrigado pelo contacto. Analisaremos as informações e retornaremos em breve.</p>
+                <button 
+                    onClick={() => setStatus({ ...status, succeeded: false })} 
+                    className="mt-6 text-sm underline uppercase tracking-tighter text-green-900 font-bold hover:text-black transition-colors"
+                >
+                    Enviar nova mensagem
+                </button>
+            </div>
+        );
     }
-  };
 
-  return (
-    <div className="container mx-auto max-w-4xl">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
-          <div>
-            <label className="block text-sm font-bold mb-2 uppercase tracking-wide">Nome completo</label>
-            <input name="name" required type="text" className="w-full p-4 border border-gray-300 rounded-none focus:outline-none focus:border-gray-800 bg-white" />
-          </div>
-          <div>
-            <label className="block text-sm font-bold mb-2 uppercase tracking-wide">E-mail</label>
-            <input name="email" required type="email" className="w-full p-4 border border-gray-300 rounded-none focus:outline-none focus:border-gray-800 bg-white" />
-          </div>
-        </div>
-        <div className="text-left">
-          <label className="block text-sm font-bold mb-2 uppercase tracking-wide">Telefone</label>
-          <input name="phone" type="tel" className="w-full p-4 border border-gray-300 rounded-none focus:outline-none focus:border-gray-800 bg-white" />
-        </div>
-        <div className="text-left">
-          <label className="block text-sm font-bold mb-2 uppercase tracking-wide">Mensagem</label>
-          <textarea name="message" required rows={5} className="w-full p-4 border border-gray-300 rounded-none focus:outline-none focus:border-gray-800 bg-gray-50 resize-none"></textarea>
-        </div>
+    return (
+        <div className="container mx-auto max-w-4xl">
+            <form onSubmit={handleSubmit} className="space-y-6">
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label htmlFor="nome" className="block text-base font-medium mb-1 uppercase tracking-wider text-xs text-gray-600">
+                            Nome completo
+                        </label>
+                        <input 
+                            id="nome"
+                            name="nome" 
+                            type="text"
+                            className="w-full px-4 py-3 border border-gray-300 bg-white focus:border-gray-800 outline-none transition-colors" 
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="email" className="block text-base font-medium mb-1 uppercase tracking-wider text-xs text-gray-600">
+                            E-mail
+                        </label>
+                        <input 
+                            id="email"
+                            name="email" 
+                            type="email"
+                            className="w-full px-4 py-3 border border-gray-300 bg-white focus:border-gray-800 outline-none transition-colors" 
+                            required
+                        />
+                    </div>
+                </div>
 
-        {status.type && (
-          <div className={`p-4 font-bold text-center uppercase tracking-widest animate-in fade-in ${status.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-            {status.message}
-          </div>
-        )}
+                <div>
+                    <label htmlFor="telefone" className="block text-base font-medium mb-1 uppercase tracking-wider text-xs text-gray-600">
+                        Telefone
+                    </label>
+                    <input 
+                        id="telefone"
+                        name="telefone" 
+                        type="tel" 
+                        className="w-full px-4 py-3 border border-gray-300 bg-white focus:border-gray-800 outline-none transition-colors" 
+                        required
+                    />
+                </div>
 
-        <button 
-          disabled={loading}
-          type="submit" 
-          className="w-full bg-gray-800 text-white hover:bg-black text-lg font-bold py-5 rounded-none transition-all uppercase tracking-widest flex items-center justify-center gap-3 disabled:bg-gray-400"
-        >
-          {loading ? <><Loader2 className="animate-spin" /> A Enviar...</> : 'Enviar Solicitação'}
-        </button>
-      </form>
-    </div>
-  );
+                <div>
+                    <label htmlFor="mensagem" className="block text-base font-medium mb-1 uppercase tracking-wider text-xs text-gray-600">
+                        Mensagem
+                    </label>
+                    <textarea 
+                        id="mensagem"
+                        name="mensagem" 
+                        rows={5} 
+                        className="w-full px-4 py-3 border border-gray-300 bg-gray-50 focus:border-gray-800 outline-none transition-colors resize-none" 
+                        required
+                    />
+                </div>
+
+                <button
+                    type="submit" 
+                    disabled={status.submitting}
+                    className="w-full bg-gray-900 text-white hover:bg-black text-lg font-bold py-5 transition-all disabled:bg-gray-400 uppercase tracking-widest flex items-center justify-center gap-2"
+                >
+                    {status.submitting ? 'A Enviar...' : 'Enviar Solicitação'}
+                </button>
+
+                {status.errors.length > 0 && (
+                    <div className="bg-red-50 border border-red-200 p-4 mt-4">
+                        {status.errors.map((error, index) => (
+                            <p key={index} className="text-red-600 text-center text-sm font-bold uppercase tracking-tighter">
+                                {error}
+                            </p>
+                        ))}
+                    </div>
+                )}
+            </form>
+        </div>
+    );
 };
 
 export default function Home() {
